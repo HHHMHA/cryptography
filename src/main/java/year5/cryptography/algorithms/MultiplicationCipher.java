@@ -4,6 +4,8 @@ import year5.cryptography.utils.ExtendedEuclidean;
 import year5.cryptography.validators.MultiplicationKeyCipherValidator;
 
 public class MultiplicationCipher extends AlphabetCipher {
+    private int cachedKey;
+
     public MultiplicationCipher() {
         var keyValidator = new MultiplicationKeyCipherValidator( this );
         encryptValidator.add( keyValidator );
@@ -11,22 +13,28 @@ public class MultiplicationCipher extends AlphabetCipher {
     }
 
     @Override
-    protected int encryptSingle( int key, int plainAlphabetCharIndex ) {
-        return multiplyWithModule( key, plainAlphabetCharIndex );
+    protected void setUp() {
+        super.setUp();
+        cachedKey = Integer.parseInt( getKey() );
     }
 
     @Override
-    protected int getDecryptionKey( int key ) {
+    protected int encryptSingle( int plainAlphabetCharIndex ) {
+        return multiplyWithModule( cachedKey, plainAlphabetCharIndex );
+    }
+
+    @Override
+    protected String getDecryptionKey() {
         int alphabetSize = getAlphabetSize();
-        int inverseKey = new ExtendedEuclidean( alphabetSize, key ).getX();
+        int inverseKey = new ExtendedEuclidean( alphabetSize, Integer.parseInt( getKey() ) ).getX(); // Cached key can only be used after setUp is called but this called before setUp
         while ( inverseKey < 0 )
             inverseKey += alphabetSize;
-        return inverseKey;
+        return String.valueOf( inverseKey );
     }
 
     @Override
-    protected int decryptSingle( int key, int cipherAlphabetCharIndex ) {
-        return multiplyWithModule( key, cipherAlphabetCharIndex );
+    protected int decryptSingle( int cipherAlphabetCharIndex ) {
+        return multiplyWithModule( cachedKey, cipherAlphabetCharIndex );
     }
 
     private int multiplyWithModule( int key, int value ) {

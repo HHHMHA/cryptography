@@ -14,11 +14,16 @@ public class MultiplicationKeyCipherValidator extends Validator {
 
     @Override
     void validate() throws IllegalKeyException {
-        int alphabetSize = cipher.getAlphabetSize();
-        int key = cipher.getKey();
+        try {
+            int alphabetSize = cipher.getAlphabetSize();
+            int key = Integer.parseInt( cipher.getKey() );
 
-        ExtendedEuclidean extendedEuclidean = new ExtendedEuclidean( alphabetSize, key );
-        if ( !extendedEuclidean.AreRelativelyPrime() )
-            throw new IllegalKeyException( getMessage(), key, alphabetSize );
+            ExtendedEuclidean extendedEuclidean = new ExtendedEuclidean( alphabetSize, key );
+            if ( !extendedEuclidean.AreRelativelyPrime() )
+                throw new IllegalKeyException( getMessage(), cipher.getKey() );
+        }
+        catch ( NumberFormatException e ) {
+            throw new IllegalKeyException( "The key must be a valid integer" );
+        }
     }
 }

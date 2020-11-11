@@ -4,12 +4,14 @@ import lombok.Getter;
 
 @Getter
 public class IllegalKeyException extends IllegalArgumentException {
-    private int key;
-    private int alphabetSize;
+    private String key;
 
-    public IllegalKeyException( String message, int key, int alphabetSize ) {
+    public IllegalKeyException( String message, String key ) {
         super( message );
         this.key = key;
-        this.alphabetSize = alphabetSize;
+    }
+
+    public IllegalKeyException( String message ) {
+        super( message );
     }
 }

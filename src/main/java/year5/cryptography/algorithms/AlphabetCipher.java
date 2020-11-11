@@ -1,5 +1,8 @@
 package year5.cryptography.algorithms;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import year5.cryptography.validators.*;
 
 public abstract class AlphabetCipher implements Cipher {
@@ -8,9 +11,12 @@ public abstract class AlphabetCipher implements Cipher {
     private static final int ASCII_LOWER_ALPHABET_START_INDEX = 'a';
     private static final int ASCII_UPPER_ALPHABET_START_INDEX = 'A';
 
+    @Getter @Setter( AccessLevel.PRIVATE )
     private String plainText;
+    @Getter @Setter( AccessLevel.PRIVATE )
     private String cipherText;
-    private int key;
+    @Getter @Setter( AccessLevel.PRIVATE )
+    private String key;
 
     protected final CompositeValidator encryptValidator = new CompositeValidator();
     protected final CompositeValidator decryptValidator = new CompositeValidator();
@@ -21,77 +27,67 @@ public abstract class AlphabetCipher implements Cipher {
     }
 
     @Override
-    public String encrypt( String plainText, int key ) {
-        this.plainText = plainText;
-        this.key = key;
-
+    public String encrypt( String plainText, String key ) {
+        setPlainText( plainText );
+        setKey( key );
         encryptValidator.validate();
+
+        setUp();
 
         StringBuilder cipherTextBuilder = new StringBuilder();
 
         for ( int i = 0; i < plainText.length(); ++i ) {
-            char cipherChar = getCipherChar( plainText.charAt( i ), key );
+            char cipherChar = getCipherChar( plainText.charAt( i ) );
             cipherTextBuilder.append( cipherChar );
         }
 
         return cipherTextBuilder.toString();
     }
 
-    private char getCipherChar( char plainChar, int key ) {
+    protected void setUp() {
+        // Optional setup before encryption/decryption but after validation
+    }
+
+    private char getCipherChar( char plainChar ) {
         int plainAlphabetCharIndex = plainChar - ASCII_LOWER_ALPHABET_START_INDEX;
-        int cipherAlphabetCharIndex = encryptSingle( key, plainAlphabetCharIndex ); // TODO: Maybe a mod here would be better for safety.
+        int cipherAlphabetCharIndex = encryptSingle( plainAlphabetCharIndex ); // TODO: Maybe a mod here would be better for safety.
         int cipherCharIndex = cipherAlphabetCharIndex + ASCII_UPPER_ALPHABET_START_INDEX;
         return (char) cipherCharIndex;
     }
 
-    protected abstract int encryptSingle( int key, int plainAlphabetCharIndex );
+    protected abstract int encryptSingle( int plainAlphabetCharIndex );
 
     @Override
-    public String decrypt( String cipherText, int key ) {
-        this.cipherText = cipherText;
-        this.key = key;
-
+    public String decrypt( String cipherText, String key ) {
+        setCipherText( cipherText );
+        setKey( key ); // set the normal key so it can be validated and later converted to decryption key if needed
         decryptValidator.validate();
+        setKey( getDecryptionKey() );
 
-        int inverseKey = getDecryptionKey( key );
+        setUp();
 
         StringBuilder plainTextBuilder = new StringBuilder();
 
         for ( int i = 0; i < cipherText.length(); ++i ) {
-            char plainChar = getPlainChar( cipherText.charAt( i ), inverseKey );
+            char plainChar = getPlainChar( cipherText.charAt( i ) );
             plainTextBuilder.append( plainChar );
         }
 
         return plainTextBuilder.toString();
     }
 
-    protected abstract int getDecryptionKey( int key );
+    protected abstract String getDecryptionKey();
 
-    private char getPlainChar( char cipherChar, int key ) {
+    private char getPlainChar( char cipherChar ) {
         int cipherAlphabetCharIndex = cipherChar - ASCII_UPPER_ALPHABET_START_INDEX;
-        int plainAlphabetCharIndex = decryptSingle( key, cipherAlphabetCharIndex );
+        int plainAlphabetCharIndex = decryptSingle( cipherAlphabetCharIndex );
         int plainCharIndex = plainAlphabetCharIndex + ASCII_LOWER_ALPHABET_START_INDEX;
         return (char) plainCharIndex;
     }
 
-    protected abstract int decryptSingle( int key, int cipherAlphabetCharIndex );
+    protected abstract int decryptSingle( int cipherAlphabetCharIndex );
 
     public static int getAlphabetSize() {
         return ALPHABET_SIZE;
-    }
-
-    @Override
-    public String getPlainText() {
-        return plainText;
-    }
-
-    @Override
-    public String getCipherText() {
-        return cipherText;
-    }
-
-    @Override
-    public int getKey() {
-        return key;
     }
 }

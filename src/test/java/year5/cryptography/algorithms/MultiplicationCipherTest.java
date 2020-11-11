@@ -6,7 +6,7 @@ import year5.cryptography.exceptions.IllegalKeyException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MultiplicationCipherTest {
-    public static final int KEY = 5;
+    public static final String KEY = "5";
     public static final String PLAIN_TEXT = "zend";
     public static final String CIPHER_TEXT = "VUNP";
     public final Cipher cipher = new MultiplicationCipher();
@@ -18,11 +18,10 @@ public class MultiplicationCipherTest {
 
     @Test
     void testEncryptWithNonValidKey() {
-        int invalidKey = 8;
+        String invalidKey = "8";
         IllegalKeyException exception = assertThrows( IllegalKeyException.class, () -> cipher.encrypt( PLAIN_TEXT, invalidKey ) );
         assertEquals( "The key isn't relatively prime to alphabet size.", exception.getMessage() );
         assertEquals( invalidKey, exception.getKey() );
-        assertEquals( 26, exception.getAlphabetSize() );
     }
 
     @Test
@@ -38,7 +37,7 @@ public class MultiplicationCipherTest {
 
     @Test
     void testDecryptWithFalseKey() {
-        int falseKey = 7;
+        String falseKey = "7";
         assertNotEquals( PLAIN_TEXT, cipher.decrypt( CIPHER_TEXT, falseKey ) );
     }
 
