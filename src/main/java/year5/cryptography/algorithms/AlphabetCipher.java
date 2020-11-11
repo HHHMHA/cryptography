@@ -8,8 +8,9 @@ import year5.cryptography.validators.*;
 public abstract class AlphabetCipher implements Cipher {
     // TODO: make dynamic (input)
     private static final int ALPHABET_SIZE = 26;
-    private static final int ASCII_LOWER_ALPHABET_START_INDEX = 'a';
-    private static final int ASCII_UPPER_ALPHABET_START_INDEX = 'A';
+
+    protected static final int ASCII_LOWER_ALPHABET_START_INDEX = 'a';
+    protected static final int ASCII_UPPER_ALPHABET_START_INDEX = 'A';
 
     @Getter @Setter( AccessLevel.PRIVATE )
     private String plainText;
@@ -87,7 +88,7 @@ public abstract class AlphabetCipher implements Cipher {
 
     protected abstract int decryptSingle( int cipherAlphabetCharIndex );
 
-    public static int getAlphabetSize() {
+    public int getAlphabetSize() {
         return ALPHABET_SIZE;
     }
 }

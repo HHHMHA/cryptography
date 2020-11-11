@@ -5,6 +5,7 @@ import year5.cryptography.exceptions.IllegalKeyException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// TODO: move test to Alhphabet Cipher except for enc/dec
 public class MultiplicationCipherTest {
     public static final String KEY = "5";
     public static final String PLAIN_TEXT = "zend";
